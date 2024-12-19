@@ -3,23 +3,12 @@ import { useCallback, useEffect } from 'react';
 import debounce from 'lodash/debounce';
 
 export default function SearchBar({ filters, onSearch }) {
-  const { data, setData, get } = useForm({
+  const { data, setData } = useForm({
     search: filters.search || '',
   });
 
   const debouncedSearch = useCallback(
     debounce((query) => {
-      get(window.location.pathname, {
-        preserveState: true,
-        preserveScroll: true,
-        only: [
-          'filters',
-          'achievements',
-          'internships',
-          'courses',
-          'publications',
-        ],
-      });
       if (onSearch) {
         onSearch(query);
       }

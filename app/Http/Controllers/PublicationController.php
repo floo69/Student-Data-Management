@@ -35,6 +35,10 @@ class PublicationController extends Controller
             'filters' => ['search' => $search]
         ]);
     }
+    public function create(): Response
+    {
+        return Inertia::render('Publications/Create');
+    }
 
 
     public function store(PublicationRequest $request)
