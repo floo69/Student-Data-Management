@@ -9,6 +9,8 @@ use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\CourseRequest;
+use Illuminate\Http\Request;
+
 
 class CourseController extends Controller
 {
@@ -16,12 +18,22 @@ class CourseController extends Controller
         private FileUploadService $fileUploadService
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->input('search');
+        $query = Course::where('user_id', Auth::id());
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('institution', 'LIKE', "%{$search}%")
+                  ->orWhere('completion_date', 'LIKE', "%{$search}%");
+            });
+        }
+
         return Inertia::render('Courses/Index', [
-            'courses' => Course::where('user_id', Auth::id())
-                ->orderBy('completion_date', 'desc')
-                ->get()
+            'courses' => $query->orderBy('completion_date', 'desc')->get(),
+            'filters' => ['search' => $search]
         ]);
     }
 

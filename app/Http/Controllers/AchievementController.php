@@ -9,6 +9,7 @@ use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AchievementRequest;
+use Illuminate\Http\Request;
 
 class AchievementController extends Controller
 {
@@ -16,15 +17,24 @@ class AchievementController extends Controller
         private FileUploadService $fileUploadService
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->input('search');
+        $query = Achievement::where('user_id', Auth::id());
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%")
+                  ->orWhere('achievement_date', 'LIKE', "%{$search}%");
+            });
+        }
+
         return Inertia::render('Achievements/Index', [
-            'achievements' => Achievement::where('user_id', Auth::id())
-                ->orderBy('achievement_date', 'desc')
-                ->get()
+            'achievements' => $query->orderBy('achievement_date', 'desc')->get(),
+            'filters' => ['search' => $search]
         ]);
     }
-
     public function create(): Response
     {
         return Inertia::render('Achievements/Create');

@@ -9,6 +9,7 @@ use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\InternshipRequest;
+use Illuminate\Http\Request;
 
 class InternshipController extends Controller
 {
@@ -16,12 +17,23 @@ class InternshipController extends Controller
         private FileUploadService $fileUploadService
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->input('search');
+        $query = Internship::where('user_id', Auth::id());
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('company', 'LIKE', "%{$search}%")
+                  ->orWhere('role', 'LIKE', "%{$search}%")
+                  ->orWhere('start_date', 'LIKE', "%{$search}%")
+                  ->orWhere('end_date', 'LIKE', "%{$search}%");
+            });
+        }
+
         return Inertia::render('Internships/Index', [
-            'internships' => Internship::where('user_id', Auth::id())
-                ->orderBy('start_date', 'desc')
-                ->get()
+            'internships' => $query->orderBy('start_date', 'desc')->get(),
+            'filters' => ['search' => $search]
         ]);
     }
 

@@ -9,6 +9,7 @@ use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\PublicationRequest;
+use Illuminate\Http\Request;
 
 class PublicationController extends Controller
 {
@@ -16,19 +17,25 @@ class PublicationController extends Controller
         private FileUploadService $fileUploadService
     ) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = $request->input('search');
+        $query = Publication::where('user_id', Auth::id());
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                  ->orWhere('journal', 'LIKE', "%{$search}%")
+                  ->orWhere('publication_date', 'LIKE', "%{$search}%");
+            });
+        }
+
         return Inertia::render('Publications/Index', [
-            'publications' => Publication::where('user_id', Auth::id())
-                ->orderBy('publication_date', 'desc')
-                ->get()
+            'publications' => $query->orderBy('publication_date', 'desc')->get(),
+            'filters' => ['search' => $search]
         ]);
     }
 
-    public function create(): Response
-    {
-        return Inertia::render('Publications/Create');
-    }
 
     public function store(PublicationRequest $request)
     {
