@@ -247,7 +247,7 @@ export default function MergedLanding({
               href="https://github.com/floo69"
               className="text-gray-400 hover:text-gray-500"
             >
-              <span className="sr-only">Linkedin</span>
+              <span className="sr-only">Github</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="25"
