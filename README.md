@@ -24,15 +24,11 @@ Follow these steps to set up the project:
    Run the following command to create the symbolic link for storage:
    `php artisan storage:link`
 
-7. **Generate Ziggy routes**  
-   Run the following command to generate Ziggy routes:
-   `php artisan ziggy:generate`
-
-8. **Install Node.js dependencies**  
+7. **Install Node.js dependencies**  
    Run the following command to install the necessary Node.js dependencies:
    `npm install`
 
-9. **Build assets**  
+8. **Build assets**  
    Run the following command to build the assets:
    `npm run build`
 
